@@ -37,7 +37,7 @@ public class Securityconfig {
                 .antMatchers("/api/auth/**").permitAll()
                 .antMatchers("/h2/**").permitAll()
                 .antMatchers("/signup.html/**").permitAll()
-                .anyRequest().permitAll();
+                .anyRequest().authenticated();
 
         return http.build();
     }

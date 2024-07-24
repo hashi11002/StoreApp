@@ -2,6 +2,7 @@ package com.StoreBackend.StoreMain.Controller;
 
 import com.StoreBackend.StoreMain.Service.LoginService;
 import com.StoreBackend.StoreMain.Service.SignupService;
+import com.StoreBackend.StoreMain.DTO.loginDTO;
 import com.StoreBackend.StoreMain.DTO.signupDTO;
 import com.StoreBackend.StoreMain.Model.Roles;
 import com.StoreBackend.StoreMain.Model.Users;
@@ -14,8 +15,12 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,22 +36,21 @@ public class UserController {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
+    private SignupService signupservice;
+    private LoginService loginService;
 
     @Autowired
     public UserController(AuthenticationManager authenticationManager,
             UserRepository userRepository,
-            RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+            RoleRepository roleRepository, PasswordEncoder passwordEncoder, SignupService signupService,
+            LoginService login) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.signupservice = signupService;
+        this.loginService = loginService;
     }
-
-    @Autowired
-    SignupService signupservice;
-
-    // @Autowired
-    // LoginService loginService;
 
     @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> signup(@RequestBody Users user) {
@@ -73,7 +77,7 @@ public class UserController {
         userEntity.setRole(Collections.singletonList(roles));
 
         try {
-            userRepository.save(userEntity);
+            signupservice.createUser(userEntity);
         } catch (Exception e) {
             // Log the exception here
             return new ResponseEntity<>("User registration failed", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -82,10 +86,12 @@ public class UserController {
         return new ResponseEntity<>("User registered", HttpStatus.OK);
     }
 
-    // @PostMapping(value = "/login")
-    // public void login(@RequestParam String username, @RequestParam String
-    // password) {
-    // loginService.authenticateUser(username, password);
-    // }
+    @PostMapping(value = "/login")
+    public ResponseEntity<String> login(@RequestBody loginDTO login) {
+        Authentication authenticated = authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authenticated);
+        return new ResponseEntity<>("User signed in successfully", HttpStatus.OK);
+    }
 
 }
