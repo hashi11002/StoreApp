@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Signup</title>
+</head>
+<body>
+    <h2>User Signup</h2>
+    <form id="signupForm">
+        <label for="firstName">First Name:</label><br>
+        <input type="text" id="firstName" name="firstName" required><br><br>
+        
+        <label for="lastName">Last Name:</label><br>
+        <input type="text" id="lastName" name="lastName" required><br><br>
+        
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" required><br><br>
+        
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username" required><br><br>
+        
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" required><br><br>
+        
+        <label for="address">Address:</label><br>
+        <input type="text" id="address" name="address"><br><br>
+        
+        <label for="postalCode">Postal Code:</label><br>
+        <input type="text" id="postalCode" name="postalCode"><br><br>
+        
+        <label for="city">City:</label><br>
+        <input type="text" id="city" name="city"><br><br>
+
+        <label for="country">Country:</label><br>
+        <input type="text" id="country" name="country"><br><br>
+        
+        <button type="button" onclick="submitForm()">Sign Up</button>
+    </form>
+
+    <script>
+        function submitForm() {
+            const form = document.getElementById('signupForm');
+            const formData = new FormData(form);
+            const object = {};
+            formData.forEach((value, key) => {
+                object[key] = value;
+            });
+            const json = JSON.stringify(object);
+
+            fetch('/api/auth/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: json
+            })
+            .then(response => response.text())
+            .then(data => alert(data))
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
