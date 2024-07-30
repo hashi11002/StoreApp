@@ -17,9 +17,9 @@ public class Items {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    private int itemName;
-    private int itemDescription;
-    private int itemPrice;
+    private String itemName;
+    private String itemDescription;
+    private float itemPrice;
     private int remainingQuantity;
 
 }
